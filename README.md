@@ -8,7 +8,7 @@ It is based on the structure of the official Microsoft sample [passThrough](http
 ## Requirements
 
 - Visual Studio 2026 ("Desktop development with C++" workload)
-- Windows Driver Kit (WDK) and the WDK extension for Visual Studio
+- Windows Driver Kit (WDK) and the WDK extension for Visual Studio (the VSIX declares a dependency on it and cannot be installed without it)
 
 ## Build
 
