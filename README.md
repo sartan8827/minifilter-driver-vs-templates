@@ -23,6 +23,12 @@ This creates the following files in `dist\`:
 | `FileSystemMiniFilter.vsix` | Visual Studio extension that contains the project template |
 | `FileSystemMiniFilter.zip` | Project template ZIP for the user templates folder |
 
+To set the VSIX version without editing the manifest, use `-Version`:
+
+```powershell
+.\Build-Template.ps1 -Version 1.2.3
+```
+
 ## Installation
 
 Use either the VSIX or the ZIP, not both. If both are installed, the template appears twice in "Create a new project".
@@ -42,7 +48,7 @@ To uninstall, open Extensions > Manage Extensions in Visual Studio, or run:
 & "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\VSIXInstaller.exe" /uninstall:FileSystemMiniFilterTemplate.7c3f1b52-4e0a-4d8b-9a61-2f5e8d0c9b17
 ```
 
-To release a new version, increase `Version` in [Vsix/extension.vsixmanifest](Vsix/extension.vsixmanifest) and rebuild.
+Released versions take their version from the tag (see [Release](#release)). Local builds without `-Version` use the `Version` in [Vsix/extension.vsixmanifest](Vsix/extension.vsixmanifest).
 
 ### ZIP
 

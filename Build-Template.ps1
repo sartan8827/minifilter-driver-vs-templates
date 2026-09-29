@@ -9,6 +9,11 @@
       dist\FileSystemMiniFilter.zip   Project template ZIP (for the user templates folder)
       dist\FileSystemMiniFilter.vsix  Visual Studio extension containing the template
 
+.PARAMETER Version
+    Overrides the VSIX version (e.g. 1.2.3). Only the packaged manifest is changed;
+    Vsix\extension.vsixmanifest is not modified.
+    Default: the Version in Vsix\extension.vsixmanifest
+
 .PARAMETER Install
     Copies the created ZIP file into the user project templates folder.
     (To install the VSIX instead, double-click dist\FileSystemMiniFilter.vsix.)
@@ -19,14 +24,23 @@
 
 .EXAMPLE
     .\Build-Template.ps1 -Install
+
+.EXAMPLE
+    .\Build-Template.ps1 -Version 1.2.3
 #>
 [CmdletBinding()]
 param(
+    [string]$Version,
     [switch]$Install,
     [string]$TemplatesDir
 )
 
 $ErrorActionPreference = 'Stop'
+
+# VSIX versions are two to four numeric parts
+if ($Version -and $Version -notmatch '^\d+(\.\d+){1,3}$') {
+    throw "Invalid version '$Version'. Use two to four numeric parts, e.g. 1.2.3."
+}
 
 Add-Type -AssemblyName System.IO.Compression
 
@@ -63,7 +77,16 @@ function New-VsixPackage {
 
     $manifestPath = Join-Path $vsixDir 'extension.vsixmanifest'
     [xml]$vsixManifest = Get-Content $manifestPath -Raw
-    $entries['extension.vsixmanifest'] = [IO.File]::ReadAllBytes($manifestPath)
+    if ($Version) {
+        $vsixManifest.PackageManifest.Metadata.Identity.Version = $Version
+        $manifestStream = New-Object IO.MemoryStream
+        $vsixManifest.Save($manifestStream)
+        $entries['extension.vsixmanifest'] = $manifestStream.ToArray()
+        $manifestStream.Dispose()
+    }
+    else {
+        $entries['extension.vsixmanifest'] = [IO.File]::ReadAllBytes($manifestPath)
+    }
     $entries['Icon.ico'] = [IO.File]::ReadAllBytes((Join-Path $sourceDir '__TemplateIcon.ico'))
 
     # The template is stored unzipped, as the VSSDK does for Visual Studio 2017 and later
