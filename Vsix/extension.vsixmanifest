@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="FileSystemMiniFilterTemplate.7c3f1b52-4e0a-4d8b-9a61-2f5e8d0c9b17" Version="1.0.0" Language="en-US" Publisher="mini-filter-driver-vs-template" />
+    <DisplayName>Filter Driver: Filesystem Mini-filter Template</DisplayName>
+    <Description xml:space="preserve">Adds the "Filter Driver: Filesystem Mini-filter" project template, which was removed from the WDK starting with Visual Studio 2019. Creates a C++ file system mini-filter driver project that uses the Filter Manager (fltmgr).</Description>
+    <Icon>Icon.ico</Icon>
+    <Tags>driver, minifilter, filter manager, fltmgr, wdk, kernel</Tags>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[18.0,19.0)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[18.0,19.0)">
+      <ProductArchitecture>arm64</ProductArchitecture>
+    </InstallationTarget>
+  </Installation>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[18.0,19.0)" DisplayName="Visual Studio core editor" />
+    <Prerequisite Id="Microsoft.VisualStudio.Component.VC.CoreIde" Version="[18.0,19.0)" DisplayName="C++ core features" />
+  </Prerequisites>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.ProjectTemplate" Path="ProjectTemplates" />
+  </Assets>
+</PackageManifest>

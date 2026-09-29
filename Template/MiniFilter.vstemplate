@@ -15,9 +15,9 @@
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
     <Icon>__TemplateIcon.ico</Icon>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-    <LanguageTag Value="CPP" />
-    <PlatformTag Value="Windows" />
-    <ProjectTypeTag Value="Driver" />
+    <LanguageTag>Cpp</LanguageTag>
+    <PlatformTag>Windows</PlatformTag>
+    <ProjectTypeTag>Driver</ProjectTypeTag>
   </TemplateData>
   <TemplateContent>
     <Project TargetFileName="$projectname$.vcxproj" File="MiniFilter.vcxproj" ReplaceParameters="true">
