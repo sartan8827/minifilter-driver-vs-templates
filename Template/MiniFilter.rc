@@ -1,0 +1,38 @@
+//
+// $safeprojectname$.rc - Version resource
+//
+
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION     1,0,0,0
+ PRODUCTVERSION  1,0,0,0
+ FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+#if DBG
+ FILEFLAGS       VS_FF_DEBUG
+#else
+ FILEFLAGS       0x0L
+#endif
+ FILEOS          VOS_NT_WINDOWS32
+ FILETYPE        VFT_DRV
+ FILESUBTYPE     VFT2_DRV_SYSTEM
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName",      "<Your company name>"     // TODO: Replace with your company name
+            VALUE "FileDescription",  "$safeprojectname$ Mini-Filter Driver"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "$safeprojectname$.sys"
+            VALUE "LegalCopyright",   "Copyright (C) $year$"
+            VALUE "OriginalFilename", "$safeprojectname$.sys"
+            VALUE "ProductName",      "$safeprojectname$"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
