@@ -7,8 +7,9 @@ Module Name:
 Abstract:
 
     This is the main module of the file system mini-filter driver.
-    It registers the filter with the Filter Manager (fltmgr.sys) and provides
-    the callbacks that are invoked before (pre) and after (post) I/O operations.
+    It registers the filter with the Filter Manager (fltmgr.sys) and handles
+    unload and instance management.
+    The pre/post-operation callbacks are in Callbacks.cpp.
 
 Environment:
 
@@ -23,10 +24,8 @@ Environment:
 
 --*/
 
-#include <fltKernel.h>
-#include <dontuse.h>
-
-#pragma prefast(disable:__WARNING_ENCODE_MEMBER_FUNCTION_POINTER, "Not valid for kernel mode drivers")
+#include "$safeprojectname$.h"
+#include "Callbacks.h"
 
 //
 //  Global variables
@@ -34,26 +33,11 @@ Environment:
 
 PFLT_FILTER gFilterHandle = nullptr;
 
-//
-//  Debug output
-//
-//  Set bits in gTraceFlags to print the corresponding traces with DbgPrint.
-//  Use a kernel debugger or DebugView to see the output.
-//
-
-#define MFDBG_TRACE_ROUTINES    0x00000001  // Routine entry
-#define MFDBG_TRACE_OPERATIONS  0x00000002  // Individual I/O operations
-
 #if DBG
 ULONG gTraceFlags = MFDBG_TRACE_ROUTINES;
 #else
 ULONG gTraceFlags = 0;
 #endif
-
-#define MF_DBG_PRINT( _dbgLevel, _string )          \
-    (FlagOn( gTraceFlags, (_dbgLevel) ) ?           \
-        DbgPrint _string :                          \
-        ((int)0))
 
 //
 //  Function prototypes
@@ -61,6 +45,7 @@ ULONG gTraceFlags = 0;
 //  DriverEntry must be extern "C" because the system calls it by its C name.
 //  The callbacks are declared extern "C" as well, because #pragma alloc_text
 //  can only be applied to functions with C linkage.
+//  The pre/post-operation callbacks are declared in Callbacks.h.
 //
 
 EXTERN_C_START
@@ -103,21 +88,6 @@ $safeprojectname$InstanceTeardownComplete (
     _In_ FLT_INSTANCE_TEARDOWN_FLAGS Flags
     );
 
-FLT_PREOP_CALLBACK_STATUS
-$safeprojectname$PreOperation (
-    _Inout_ PFLT_CALLBACK_DATA Data,
-    _In_ PCFLT_RELATED_OBJECTS FltObjects,
-    _Flt_CompletionContext_Outptr_ PVOID *CompletionContext
-    );
-
-FLT_POSTOP_CALLBACK_STATUS
-$safeprojectname$PostOperation (
-    _Inout_ PFLT_CALLBACK_DATA Data,
-    _In_ PCFLT_RELATED_OBJECTS FltObjects,
-    _In_opt_ PVOID CompletionContext,
-    _In_ FLT_POST_OPERATION_FLAGS Flags
-    );
-
 EXTERN_C_END
 
 //
@@ -132,218 +102,6 @@ EXTERN_C_END
 #pragma alloc_text(PAGE, $safeprojectname$InstanceTeardownStart)
 #pragma alloc_text(PAGE, $safeprojectname$InstanceTeardownComplete)
 #endif
-
-//
-//  Operation registration
-//
-//  Move the entries you need out of the #if 0 block, or enable the block.
-//  You can also use separate pre/post callbacks for each operation.
-//
-
-CONST FLT_OPERATION_REGISTRATION Callbacks[] = {
-
-    { IRP_MJ_CREATE,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-#if 0 // TODO: Enable only the operations you need
-
-    { IRP_MJ_CREATE_NAMED_PIPE,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_CLOSE,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_READ,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_WRITE,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_QUERY_INFORMATION,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_SET_INFORMATION,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_QUERY_EA,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_SET_EA,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_FLUSH_BUFFERS,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_QUERY_VOLUME_INFORMATION,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_SET_VOLUME_INFORMATION,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_DIRECTORY_CONTROL,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_FILE_SYSTEM_CONTROL,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_DEVICE_CONTROL,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_INTERNAL_DEVICE_CONTROL,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    //  A post-operation callback cannot be registered for IRP_MJ_SHUTDOWN
-    { IRP_MJ_SHUTDOWN,
-      0,
-      $safeprojectname$PreOperation,
-      nullptr },
-
-    { IRP_MJ_LOCK_CONTROL,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_CLEANUP,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_CREATE_MAILSLOT,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_QUERY_SECURITY,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_SET_SECURITY,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_QUERY_QUOTA,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_SET_QUOTA,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_PNP,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_ACQUIRE_FOR_SECTION_SYNCHRONIZATION,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_RELEASE_FOR_SECTION_SYNCHRONIZATION,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_ACQUIRE_FOR_MOD_WRITE,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_RELEASE_FOR_MOD_WRITE,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_ACQUIRE_FOR_CC_FLUSH,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_RELEASE_FOR_CC_FLUSH,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_FAST_IO_CHECK_IF_POSSIBLE,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_NETWORK_QUERY_OPEN,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_MDL_READ,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_MDL_READ_COMPLETE,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_PREPARE_MDL_WRITE,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_MDL_WRITE_COMPLETE,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_VOLUME_MOUNT,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-    { IRP_MJ_VOLUME_DISMOUNT,
-      0,
-      $safeprojectname$PreOperation,
-      $safeprojectname$PostOperation },
-
-#endif // TODO
-
-    { IRP_MJ_OPERATION_END }
-};
 
 //
 //  Filter registration
@@ -621,107 +379,4 @@ Arguments:
 
     MF_DBG_PRINT( MFDBG_TRACE_ROUTINES,
                   ("$safeprojectname$!$safeprojectname$InstanceTeardownComplete: Entered\n") );
-}
-
-
-/*************************************************************************
-    Mini-filter callback routines
-*************************************************************************/
-
-FLT_PREOP_CALLBACK_STATUS
-$safeprojectname$PreOperation (
-    _Inout_ PFLT_CALLBACK_DATA Data,
-    _In_ PCFLT_RELATED_OBJECTS FltObjects,
-    _Flt_CompletionContext_Outptr_ PVOID *CompletionContext
-    )
-/*++
-
-Routine Description:
-
-    Pre-operation callback for the registered operations.
-    Called before the request is passed to the file system.
-
-Arguments:
-
-    Data - Callback data for this I/O operation.
-
-    FltObjects - Pointer to the objects related to this operation
-                 (volume, instance, and file object).
-
-    CompletionContext - A context to pass to the post-operation callback
-                        can be set here.
-
-Return Value:
-
-    FLT_PREOP_SUCCESS_WITH_CALLBACK - Continue processing and call the post-operation callback.
-    FLT_PREOP_SUCCESS_NO_CALLBACK   - Continue processing without calling the post-operation callback.
-    FLT_PREOP_COMPLETE              - Complete the operation here (set Data->IoStatus).
-    See the FLT_PREOP_CALLBACK_STATUS documentation for other values.
-
---*/
-{
-    UNREFERENCED_PARAMETER( FltObjects );
-    UNREFERENCED_PARAMETER( CompletionContext );
-
-    MF_DBG_PRINT( MFDBG_TRACE_OPERATIONS,
-                  ("$safeprojectname$!$safeprojectname$PreOperation: MajorFunction=%u\n",
-                   Data->Iopb->MajorFunction) );
-
-    //
-    //  TODO: Implement pre-operation processing here.
-    //        Example: use FltGetFileNameInformation to get the file name.
-    //
-
-    return FLT_PREOP_SUCCESS_WITH_CALLBACK;
-}
-
-FLT_POSTOP_CALLBACK_STATUS
-$safeprojectname$PostOperation (
-    _Inout_ PFLT_CALLBACK_DATA Data,
-    _In_ PCFLT_RELATED_OBJECTS FltObjects,
-    _In_opt_ PVOID CompletionContext,
-    _In_ FLT_POST_OPERATION_FLAGS Flags
-    )
-/*++
-
-Routine Description:
-
-    Post-operation callback for the registered operations.
-    Called after the file system has completed the request.
-
-    Note: This routine can be called at DISPATCH_LEVEL.
-          Do not access pageable code or memory.
-          Use FltDoCompletionProcessingWhenSafe if processing must be done
-          at PASSIVE_LEVEL.
-
-Arguments:
-
-    Data - Callback data for this I/O operation.
-
-    FltObjects - Pointer to the objects related to this operation.
-
-    CompletionContext - The context set by the pre-operation callback.
-
-    Flags - If FLTFL_POST_OPERATION_DRAINING is set, the instance is being
-            torn down; do only minimal post-processing.
-
-Return Value:
-
-    FLT_POSTOP_FINISHED_PROCESSING - Post-processing is complete.
-
---*/
-{
-    UNREFERENCED_PARAMETER( Data );
-    UNREFERENCED_PARAMETER( FltObjects );
-    UNREFERENCED_PARAMETER( CompletionContext );
-    UNREFERENCED_PARAMETER( Flags );
-
-    MF_DBG_PRINT( MFDBG_TRACE_OPERATIONS,
-                  ("$safeprojectname$!$safeprojectname$PostOperation: Entered\n") );
-
-    //
-    //  TODO: Implement post-operation processing here.
-    //
-
-    return FLT_POSTOP_FINISHED_PROCESSING;
 }

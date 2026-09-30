@@ -72,7 +72,10 @@ Restart Visual Studio and search for "**Filter Driver: Filesystem Mini-filter**"
 
 | File | Description |
 |---|---|
-| `<name>.cpp` | C++ source. DriverEntry, Unload, instance management callbacks, and pre/post-operation callbacks. Only IRP_MJ_CREATE is enabled; the other IRP_MJ entries are provided in an `#if 0` block |
+| `<name>.cpp` | C++ source. DriverEntry, Unload, and instance management callbacks |
+| `<name>.h` | Common definitions (debug trace flags and `MF_DBG_PRINT`) |
+| `Callbacks.cpp` | Operation registration table and pre/post-operation callbacks. Each IRP_MJ operation has its own pair of callbacks (e.g. `<name>PreCreateCallback` / `<name>PostCreateCallback` for IRP_MJ_CREATE). Only IRP_MJ_CREATE is enabled; the other IRP_MJ entries are provided in an `#if 0` block |
+| `Callbacks.h` | Declarations of the operation registration table and the pre/post-operation callbacks |
 | `<name>.inf` | INF for installing the mini-filter. On Windows build 25952 and later the driver runs from the driver store; on earlier builds it runs from `system32\drivers` |
 | `<name>.rc` | Version resource |
 

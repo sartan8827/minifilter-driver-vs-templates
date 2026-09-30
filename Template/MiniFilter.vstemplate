@@ -23,6 +23,9 @@
     <Project TargetFileName="$projectname$.vcxproj" File="MiniFilter.vcxproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" TargetFileName="$projectname$.vcxproj.filters">MiniFilter.vcxproj.filters</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="$safeprojectname$.cpp" OpenInEditor="true">MiniFilter.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="$safeprojectname$.h">MiniFilter.h</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Callbacks.cpp">Callbacks.cpp</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Callbacks.h">Callbacks.h</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="$safeprojectname$.inf">MiniFilter.inf</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="$safeprojectname$.rc">MiniFilter.rc</ProjectItem>
     </Project>

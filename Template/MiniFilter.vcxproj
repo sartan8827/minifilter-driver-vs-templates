@@ -65,6 +65,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$safeprojectname$.cpp" />
+    <ClCompile Include="Callbacks.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$safeprojectname$.h" />
+    <ClInclude Include="Callbacks.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$safeprojectname$.rc" />
