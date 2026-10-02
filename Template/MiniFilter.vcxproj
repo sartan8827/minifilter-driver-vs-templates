@@ -57,7 +57,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies);$(DDK_LIB_PATH)fltMgr.lib</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies);$(DDK_LIB_PATH)fltMgr.lib;$(DDK_LIB_PATH)wdmsec.lib</AdditionalDependencies>
     </Link>
     <DriverSign>
       <FileDigestAlgorithm>sha256</FileDigestAlgorithm>
@@ -66,10 +66,13 @@
   <ItemGroup>
     <ClCompile Include="$safeprojectname$.cpp" />
     <ClCompile Include="Callbacks.cpp" />
+    <ClCompile Include="Control.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$safeprojectname$.h" />
     <ClInclude Include="Callbacks.h" />
+    <ClInclude Include="Control.h" />
+    <ClInclude Include="Public.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$safeprojectname$.rc" />

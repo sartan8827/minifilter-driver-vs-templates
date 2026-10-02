@@ -10,6 +10,7 @@ Abstract:
     It registers the filter with the Filter Manager (fltmgr.sys) and handles
     unload and instance management.
     The pre/post-operation callbacks are in Callbacks.cpp.
+    The control device for user-mode I/O control is in Control.cpp.
 
 Environment:
 
@@ -26,6 +27,7 @@ Environment:
 
 #include "$safeprojectname$.h"
 #include "Callbacks.h"
+#include "Control.h"
 
 //
 //  Global variables
@@ -176,18 +178,35 @@ Return Value:
 
     FLT_ASSERT( NT_SUCCESS( status ) );
 
-    if (NT_SUCCESS( status )) {
+    if (!NT_SUCCESS( status )) {
 
-        //
-        //  Start filtering I/O.
-        //
+        return status;
+    }
 
-        status = FltStartFiltering( gFilterHandle );
+    //
+    //  Create the control device and its symbolic link for user-mode
+    //  I/O control. FltRegisterFilter replaces DriverObject->DriverUnload,
+    //  so the control device is deleted in $safeprojectname$Unload.
+    //
 
-        if (!NT_SUCCESS( status )) {
+    status = $safeprojectname$CreateControlDevice( DriverObject );
 
-            FltUnregisterFilter( gFilterHandle );
-        }
+    if (!NT_SUCCESS( status )) {
+
+        FltUnregisterFilter( gFilterHandle );
+        return status;
+    }
+
+    //
+    //  Start filtering I/O.
+    //
+
+    status = FltStartFiltering( gFilterHandle );
+
+    if (!NT_SUCCESS( status )) {
+
+        $safeprojectname$DeleteControlDevice();
+        FltUnregisterFilter( gFilterHandle );
     }
 
     return status;
@@ -202,7 +221,8 @@ $safeprojectname$Unload (
 Routine Description:
 
     Called when the mini-filter is unloaded (for example, by fltmc unload).
-    Unregisters the filter and frees any allocated resources.
+    Deletes the control device, unregisters the filter, and frees any
+    allocated resources.
 
 Arguments:
 
@@ -222,6 +242,8 @@ Return Value:
 
     MF_DBG_PRINT( MFDBG_TRACE_ROUTINES,
                   ("$safeprojectname$!$safeprojectname$Unload: Entered\n") );
+
+    $safeprojectname$DeleteControlDevice();
 
     FltUnregisterFilter( gFilterHandle );
 

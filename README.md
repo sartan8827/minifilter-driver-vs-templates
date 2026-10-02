@@ -76,6 +76,9 @@ Restart Visual Studio and search for "**Filter Driver: Filesystem Mini-filter**"
 | `<name>.h` | Common definitions (debug trace flags and `MF_DBG_PRINT`) |
 | `Callbacks.cpp` | Operation registration table and pre/post-operation callbacks. Each IRP_MJ operation has its own pair of callbacks (e.g. `<name>PreCreateCallback` / `<name>PostCreateCallback` for IRP_MJ_CREATE). Only IRP_MJ_CREATE is enabled; the other IRP_MJ entries are provided in an `#if 0` block |
 | `Callbacks.h` | Declarations of the operation registration table and the pre/post-operation callbacks |
+| `Control.cpp` | Control device object (`\Device\<name>`) and its symbolic link (`\\.\<name>`) for user-mode communication, plus the IRP_MJ_CREATE/CLEANUP/CLOSE and IRP_MJ_DEVICE_CONTROL dispatch routines. Only SYSTEM and administrators can open the device |
+| `Control.h` | Declarations of the control device routines |
+| `Public.h` | Definitions shared with user-mode applications: device names, I/O control codes (sample: `IOCTL_MF_GET_VERSION`), and their buffer structures |
 | `<name>.inf` | INF for installing the mini-filter. On Windows build 25952 and later the driver runs from the driver store; on earlier builds it runs from `system32\drivers` |
 | `<name>.rc` | Version resource |
 
@@ -83,6 +86,6 @@ Main project settings:
 
 - Platforms: x64 / ARM64 (Debug / Release)
 - Toolset: `WindowsKernelModeDriver10.0`, driver type: WDM, target platform: Universal
-- Links `fltMgr.lib`
+- Links `fltMgr.lib` and `wdmsec.lib` (for `IoCreateDeviceSecure`)
 - Warning level 4, warnings treated as errors
 - `/utf-8` (source files are compiled as UTF-8)
