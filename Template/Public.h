@@ -7,10 +7,11 @@ Module Name:
 Abstract:
 
     Definitions shared between the mini-filter driver and user-mode
-    applications: the control device names, the I/O control codes, and the
-    structures exchanged through DeviceIoControl.
+    applications: the communication port name, the message commands, and the
+    structures exchanged through the filter communication port.
 
-    In user mode, include <windows.h> (or <winioctl.h>) before this header.
+    User-mode applications include <windows.h> and <fltUser.h> before this
+    header and link with FltLib.lib.
 
 Environment:
 
@@ -21,34 +22,41 @@ Environment:
 #pragma once
 
 //
-//  Control device names
+//  Communication port name
 //
-//  MF_DEVICE_NAME and MF_SYMBOLIC_LINK_NAME are used by the driver.
-//  User-mode applications open the device with CreateFile(MF_USER_DEVICE_NAME, ...).
-//
-
-#define MF_DEVICE_NAME          L"\\Device\\$safeprojectname$"
-#define MF_SYMBOLIC_LINK_NAME   L"\\DosDevices\\$safeprojectname$"
-#define MF_USER_DEVICE_NAME     L"\\\\.\\$safeprojectname$"
-
-//
-//  I/O control codes
-//
-//  Device types 0x8000-0xFFFF and function codes 0x800-0xFFF are reserved
-//  for vendors.
+//  User-mode applications connect to the port with
+//  FilterConnectCommunicationPort( MF_PORT_NAME, ... ) and send messages
+//  with FilterSendMessage.
 //
 
-#define MF_DEVICE_TYPE          0x8000
-
-#define IOCTL_MF_GET_VERSION \
-    CTL_CODE( MF_DEVICE_TYPE, 0x800, METHOD_BUFFERED, FILE_ANY_ACCESS )
+#define MF_PORT_NAME            L"\\$safeprojectname$Port"
 
 //
-//  TODO: Add your own I/O control codes here.
+//  Commands sent from user mode to the mini-filter (FilterSendMessage)
 //
 
+typedef enum _MF_COMMAND {
+
+    MfCommandGetVersion = 1,
+
+    //
+    //  TODO: Add your own commands here.
+    //
+
+} MF_COMMAND;
+
 //
-//  Output buffer of IOCTL_MF_GET_VERSION
+//  Input buffer of FilterSendMessage. Every message starts with the command.
+//
+
+typedef struct _MF_COMMAND_MESSAGE {
+
+    MF_COMMAND Command;
+
+} MF_COMMAND_MESSAGE, *PMF_COMMAND_MESSAGE;
+
+//
+//  Output buffer of MfCommandGetVersion
 //
 
 #define MF_VERSION_MAJOR        1

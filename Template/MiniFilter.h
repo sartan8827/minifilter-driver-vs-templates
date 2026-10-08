@@ -22,6 +22,12 @@ Environment:
 #pragma prefast(disable:__WARNING_ENCODE_MEMBER_FUNCTION_POINTER, "Not valid for kernel mode drivers")
 
 //
+//  Filter handle returned by FltRegisterFilter
+//
+
+extern PFLT_FILTER gFilterHandle;
+
+//
 //  Debug output
 //
 //  Set bits in gTraceFlags to print the corresponding traces with DbgPrint.

@@ -10,7 +10,7 @@ Abstract:
     It registers the filter with the Filter Manager (fltmgr.sys) and handles
     unload and instance management.
     The pre/post-operation callbacks are in Callbacks.cpp.
-    The control device for user-mode I/O control is in Control.cpp.
+    The communication port for user-mode applications is in Communication.cpp.
 
 Environment:
 
@@ -27,7 +27,7 @@ Environment:
 
 #include "$safeprojectname$.h"
 #include "Callbacks.h"
-#include "Control.h"
+#include "Communication.h"
 
 //
 //  Global variables
@@ -184,12 +184,10 @@ Return Value:
     }
 
     //
-    //  Create the control device and its symbolic link for user-mode
-    //  I/O control. FltRegisterFilter replaces DriverObject->DriverUnload,
-    //  so the control device is deleted in $safeprojectname$Unload.
+    //  Create the communication port that user-mode applications connect to.
     //
 
-    status = $safeprojectname$CreateControlDevice( DriverObject );
+    status = $safeprojectname$CreateCommunicationPort( gFilterHandle );
 
     if (!NT_SUCCESS( status )) {
 
@@ -205,7 +203,7 @@ Return Value:
 
     if (!NT_SUCCESS( status )) {
 
-        $safeprojectname$DeleteControlDevice();
+        $safeprojectname$CloseCommunicationPort();
         FltUnregisterFilter( gFilterHandle );
     }
 
@@ -221,7 +219,7 @@ $safeprojectname$Unload (
 Routine Description:
 
     Called when the mini-filter is unloaded (for example, by fltmc unload).
-    Deletes the control device, unregisters the filter, and frees any
+    Closes the communication port, unregisters the filter, and frees any
     allocated resources.
 
 Arguments:
@@ -243,7 +241,7 @@ Return Value:
     MF_DBG_PRINT( MFDBG_TRACE_ROUTINES,
                   ("$safeprojectname$!$safeprojectname$Unload: Entered\n") );
 
-    $safeprojectname$DeleteControlDevice();
+    $safeprojectname$CloseCommunicationPort();
 
     FltUnregisterFilter( gFilterHandle );
 
